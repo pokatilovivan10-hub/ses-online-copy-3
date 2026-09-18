@@ -933,7 +933,7 @@ h1 .accent{color:#ff5a67}
     if(phone.value === '+7 (' || phone.value === '+7') phone.value = '';
   });
 
-  /* ---- Form validation & submit (заявка уходит в серверный обработчик) ---- */
+  /* ---- Form validation & submit (заявка уходит на почту) ---- */
   var form = document.getElementById('leadForm');
   var success = document.getElementById('formSuccess');
   var submitBtn = form.querySelector('button[type="submit"]');
@@ -949,31 +949,19 @@ h1 .accent{color:#ff5a67}
     phone.classList.remove('error');
     submitBtn.disabled = true;
     submitBtn.textContent = 'Отправляем…';
-    fetch('https://ses-form-relay.pokatilovivan10.chatgpt.site/api/lead', {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({
-        name: form.name.value,
-        phone: phone.value,
-        address: form.address.value
-      })
-    })
-    .then(function(r){
-      return r.text().then(function(t){
-        var data;
-        try { data = JSON.parse(t); } catch(e) { data = null; }
-        if(r.ok && data && data.ok === true) return data;
-        throw new Error((data && data.error) || 'send failed');
-      });
-    })
-    .then(function(){
+    var subject = 'Новая заявка с сайта сэс.su';
+    var body = [
+      'Новая заявка с сайта сэс.su',
+      '',
+      'Имя: ' + (form.name.value || '—'),
+      'Телефон: ' + phone.value,
+      'Адрес: ' + (form.address.value || '—'),
+      'Скидка: 10% (заказ с сайта)'
+    ].join('\n');
+    window.location.href = 'mailto:professional-dez@yandex.ru?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
+    setTimeout(function(){
       window.location.assign('thanks/');
-    })
-    .catch(function(err){
-      submitBtn.disabled = false;
-      submitBtn.textContent = submitLabel;
-      alert('Не удалось отправить заявку (' + err.message + '). Пожалуйста, позвоните нам: +7 395 560 13 28');
-    });
+    }, 1200);
   });
 })();
 </script>
