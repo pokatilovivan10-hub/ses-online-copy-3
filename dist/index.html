@@ -938,6 +938,18 @@ h1 .accent{color:#ff5a67}
   var success = document.getElementById('formSuccess');
   var submitBtn = form.querySelector('button[type="submit"]');
   var submitLabel = submitBtn.textContent;
+  function openEmailFallback(){
+    var subject = 'Новая заявка с ' + location.hostname;
+    var body = [
+      'Имя: ' + (form.name.value || 'Не указано'),
+      'Телефон: ' + phone.value,
+      'Адрес: ' + (form.address.value || 'Не указан'),
+      'Услуга: Заявка с формы',
+      'Скидка: 10% (заказ с сайта)',
+      'Сайт: ' + location.href
+    ].join('\n');
+    window.location.href = 'mailto:professional-dez@yandex.ru?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
+  }
   form.addEventListener('submit', function(e){
     e.preventDefault();
     var digits = phone.value.replace(/\D/g, '');
@@ -973,7 +985,7 @@ h1 .accent{color:#ff5a67}
       form.reset();
       window.location.assign('thanks/');
     }).catch(function(){
-      alert('Не удалось отправить заявку. Позвоните нам по номеру +7 495 151 67 24.');
+      openEmailFallback();
     }).finally(function(){
       submitBtn.disabled = false;
       submitBtn.textContent = submitLabel;
