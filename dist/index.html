@@ -949,18 +949,26 @@ h1 .accent{color:#ff5a67}
     phone.classList.remove('error');
     submitBtn.disabled = true;
     submitBtn.textContent = 'Отправляем…';
-    fetch('https://ses-form-relay.pokatilovivan10.chatgpt.site/api/lead', {
+    fetch('https://formsubmit.co/ajax/professional-dez@yandex.ru', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
       body: JSON.stringify({
+        _subject: 'Новая заявка с ' + location.hostname,
+        _template: 'table',
+        _captcha: 'false',
+        site: location.hostname,
         name: form.name.value || '',
         phone: phone.value,
         address: form.address.value || '',
         service: 'Заявка с формы',
-        comment: 'Скидка 10% (заказ с сайта)'
+        discount: '10% (заказ с сайта)'
       })
     }).then(function(response){
-      if(!response.ok) throw new Error('send-failed');
+      return response.json().then(function(data){
+        if(!response.ok || !data || data.success !== 'true') throw new Error((data && data.message) || 'send-failed');
+        return data;
+      });
+    }).then(function(){
       success.classList.add('show');
       form.reset();
       window.location.assign('thanks/');
